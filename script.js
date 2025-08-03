@@ -12,6 +12,8 @@ class TicTacToe3D {
         this.currentPlayer = 'X';
         this.gameActive = true;
         this.winningLine = [];
+        this.gameMode = 'pvp'; // 'pvp' or 'ai'
+        this.isAITurn = false;
         
         this.cubeSize = 0.8;
         this.cubeSpacing = 1.2;
@@ -165,6 +167,21 @@ class TicTacToe3D {
             this.resetGame();
         });
         
+        // Game mode selector
+        document.getElementById('game-mode').addEventListener('change', (e) => {
+            this.gameMode = e.target.value;
+            this.resetGame();
+        });
+        
+        // Floating camera controls
+        document.getElementById('camera-controls-btn').addEventListener('click', () => {
+            this.toggleCameraPanel();
+        });
+        
+        document.getElementById('close-camera-panel').addEventListener('click', () => {
+            this.toggleCameraPanel();
+        });
+        
         // Rotation controls
         document.getElementById('x-rotation').addEventListener('input', (e) => {
             this.rotateCamera('x', e.target.value);
@@ -209,7 +226,7 @@ class TicTacToe3D {
     }
     
     onMouseClick(event) {
-        if (!this.gameActive) return;
+        if (!this.gameActive || this.isAITurn) return;
         
         const rect = this.renderer.domElement.getBoundingClientRect();
         this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -256,6 +273,15 @@ class TicTacToe3D {
             // Switch player
             this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
             this.updatePlayerDisplay();
+            
+            // If AI mode and it's AI's turn, make AI move
+            if (this.gameMode === 'ai' && this.currentPlayer === 'O' && this.gameActive) {
+                this.isAITurn = true;
+                this.updateStatusForAITurn();
+                setTimeout(() => {
+                    this.makeAIMove();
+                }, 1000); // 1 second delay for better UX
+            }
         }
     }
     
@@ -301,6 +327,98 @@ class TicTacToe3D {
         cube.userData.player = player;
         
         console.log('2D marker created for player:', player, 'at position:', x, y);
+    }
+    
+    toggleCameraPanel() {
+        const panel = document.getElementById('camera-controls-panel');
+        panel.classList.toggle('show');
+    }
+    
+    makeAIMove() {
+        if (!this.gameActive || !this.isAITurn) return;
+        
+        // Simple AI: Find the best available move
+        const bestMove = this.findBestMove();
+        
+        if (bestMove) {
+            const { x, y, z } = bestMove;
+            const cube = this.cubes.find(c => 
+                c.userData.x === x && 
+                c.userData.y === y && 
+                c.userData.z === z
+            );
+            
+            if (cube && !cube.userData.occupied) {
+                this.placeMarker(cube);
+                this.isAITurn = false;
+            }
+        }
+    }
+    
+    findBestMove() {
+        // Simple AI strategy:
+        // 1. Try to win if possible
+        // 2. Block opponent's winning move
+        // 3. Take center if available
+        // 4. Take any available corner
+        // 5. Take any available edge
+        
+        const availableMoves = [];
+        
+        // Collect all available moves
+        for (let x = 0; x < 3; x++) {
+            for (let y = 0; y < 3; y++) {
+                for (let z = 0; z < 3; z++) {
+                    if (this.gameBoard[x][y][z] === null) {
+                        availableMoves.push({ x, y, z });
+                    }
+                }
+            }
+        }
+        
+        if (availableMoves.length === 0) return null;
+        
+        // 1. Try to win
+        for (const move of availableMoves) {
+            this.gameBoard[move.x][move.y][move.z] = 'O';
+            if (this.checkWin(move.x, move.y, move.z)) {
+                this.gameBoard[move.x][move.y][move.z] = null;
+                return move;
+            }
+            this.gameBoard[move.x][move.y][move.z] = null;
+        }
+        
+        // 2. Block opponent's winning move
+        for (const move of availableMoves) {
+            this.gameBoard[move.x][move.y][move.z] = 'X';
+            if (this.checkWin(move.x, move.y, move.z)) {
+                this.gameBoard[move.x][move.y][move.z] = null;
+                return move;
+            }
+            this.gameBoard[move.x][move.y][move.z] = null;
+        }
+        
+        // 3. Take center if available
+        if (this.gameBoard[1][1][1] === null) {
+            return { x: 1, y: 1, z: 1 };
+        }
+        
+        // 4. Take any available corner
+        const corners = [
+            { x: 0, y: 0, z: 0 }, { x: 2, y: 0, z: 0 },
+            { x: 0, y: 2, z: 0 }, { x: 2, y: 2, z: 0 },
+            { x: 0, y: 0, z: 2 }, { x: 2, y: 0, z: 2 },
+            { x: 0, y: 2, z: 2 }, { x: 2, y: 2, z: 2 }
+        ];
+        
+        for (const corner of corners) {
+            if (this.gameBoard[corner.x][corner.y][corner.z] === null) {
+                return corner;
+            }
+        }
+        
+        // 5. Take any available move
+        return availableMoves[0];
     }
     
 
@@ -467,6 +585,7 @@ class TicTacToe3D {
         this.currentPlayer = 'X';
         this.gameActive = true;
         this.winningLine = [];
+        this.isAITurn = false;
         
         // Reset camera
         this.camera.position.set(5, 5, 5);
@@ -512,6 +631,12 @@ class TicTacToe3D {
     
     updateStatusMessage(message) {
         document.getElementById('status-message').textContent = message;
+    }
+    
+    updateStatusForAITurn() {
+        if (this.gameMode === 'ai' && this.currentPlayer === 'O' && this.gameActive) {
+            this.updateStatusMessage("AI is thinking...");
+        }
     }
     
     onWindowResize() {

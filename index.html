@@ -11,20 +11,40 @@
         <header class="game-header">
             <h1>3D Tic Tac Toe</h1>
             <div class="game-info">
+                <div class="game-mode-selector">
+                    <label for="game-mode">Game Mode:</label>
+                    <select id="game-mode" class="mode-select">
+                        <option value="pvp">Player vs Player</option>
+                        <option value="ai">Player vs AI</option>
+                    </select>
+                </div>
                 <div class="current-player">
                     <span>Current Player:</span>
                     <span id="player-display">X</span>
                 </div>
                 <button id="reset-btn" class="reset-button">Reset Game</button>
             </div>
+            <div class="game-status">
+                <div id="status-message" class="status-message">Click on any cube to place your marker!</div>
+            </div>
         </header>
 
         <div class="game-board">
             <div id="game-canvas"></div>
             
-            <div class="controls">
-                <div class="rotation-controls">
+            <!-- Floating Camera Controls Button -->
+            <button id="camera-controls-btn" class="floating-camera-btn">
+                <span>📷</span>
+                <span>Camera</span>
+            </button>
+            
+            <!-- Floating Camera Controls Panel -->
+            <div id="camera-controls-panel" class="floating-controls-panel">
+                <div class="panel-header">
                     <h3>Camera Controls</h3>
+                    <button id="close-camera-panel" class="close-btn">×</button>
+                </div>
+                <div class="rotation-controls">
                     <div class="control-group">
                         <label for="x-rotation">X Rotation:</label>
                         <input type="range" id="x-rotation" min="0" max="360" value="0" class="slider">
@@ -41,11 +61,8 @@
                         <span id="z-value">0°</span>
                     </div>
                 </div>
-                
-                <div class="game-status">
-                    <div id="status-message" class="status-message">Click on any cube to place your marker!</div>
-                </div>
             </div>
+            
         </div>
     </div>
 
