@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Tic Tac Toe</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1>3D Tic Tac Toe</h1>
+            <div class="game-info">
+                <div class="current-player">
+                    <span>Current Player:</span>
+                    <span id="player-display">X</span>
+                </div>
+                <button id="reset-btn" class="reset-button">Reset Game</button>
+            </div>
+        </header>
+
+        <div class="game-board">
+            <div id="game-canvas"></div>
+            
+            <div class="controls">
+                <div class="rotation-controls">
+                    <h3>Camera Controls</h3>
+                    <div class="control-group">
+                        <label for="x-rotation">X Rotation:</label>
+                        <input type="range" id="x-rotation" min="0" max="360" value="0" class="slider">
+                        <span id="x-value">0°</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="y-rotation">Y Rotation:</label>
+                        <input type="range" id="y-rotation" min="0" max="360" value="0" class="slider">
+                        <span id="y-value">0°</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="z-rotation">Z Rotation:</label>
+                        <input type="range" id="z-rotation" min="0" max="360" value="0" class="slider">
+                        <span id="z-value">0°</span>
+                    </div>
+                </div>
+                
+                <div class="game-status">
+                    <div id="status-message" class="status-message">Click on any cube to place your marker!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
